@@ -31,7 +31,7 @@ int main(int argc, char const *argv[])
     auto parser = drake::multibody::Parser(&res.plant);
     parser.package_map().Remove("drake_models");
     parser.package_map().Add("gcs", "/home/elaina/projects/gcs-science-robotics");
-    parser.package_map().Add("drake_models", "/home/elaina/projects/models");
+    parser.package_map().Add("drake_models", "/home/elaina/projects/manipulation/models");
     const std::string directives_file = parser.package_map().GetPath("gcs") + "/models/bimanual_iiwa.yaml";
     auto directives = drake::multibody::parsing::LoadModelDirectives(directives_file);
     auto models = drake::multibody::parsing::ProcessModelDirectives(directives, &parser);
@@ -83,7 +83,7 @@ int main(int argc, char const *argv[])
     iris_options.num_collision_infeasible_samples = 1;
 
     helpers::filterCollsionGeometry(res.scene_graph, sg_context);
-    
+    auto seeds = helpers::getConfigurationSeeds();
     
 
     drake::log()->info("example ended.");
