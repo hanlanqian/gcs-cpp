@@ -1,6 +1,5 @@
 #include "helpers.h"
 
-#include <thread>
 #include <future>
 
 #include <drake/geometry/geometry_roles.h>
@@ -127,18 +126,21 @@ std::unordered_map<std::string, drake::math::RigidTransform<double>> helpers::ge
     return std::unordered_map<std::string, drake::math::RigidTransform<double>>();
 }
 
-drake::geometry::optimization::HPolyhedron helpers::calcRegion(int i, Eigen::Ref<const drake::VectorX<double>> &seed, drake::multibody::MultibodyPlant<double> &plant, drake::systems::Context<double> *context)
+drake::geometry::optimization::HPolyhedron helpers::calcRegion(int i, const drake::VectorX<double> &seed, drake::multibody::MultibodyPlant<double> &plant, drake::systems::Context<double> *context, drake::geometry::optimization::IrisOptions &iris_options)
 {
+    sem.acquire();
     auto timer = new drake::SteadyTimer();
     timer->Start();
     auto plan_context = &plant.GetMyMutableContextFromRoot(context);
-    plant.SetPositions(context, seed);
-    auto hpoly = drake::geometry::optimization::IrisInConfigurationSpace(plant, *plan_context);
+    plant.SetPositions(plan_context, seed);
+    drake::log()->info("Time: {1} minutes.", i, timer->Tick());
+    auto hpoly = drake::geometry::optimization::IrisInConfigurationSpace(plant, *plan_context, iris_options);
     drake::log()->info("Seed: {0}\tTime: {1} minutes.\tFaces: {2}", i, timer->Tick(), hpoly.b().size());
+    sem.release();
     return hpoly;
 }
 
-std::vector<drake::geometry::optimization::HPolyhedron> helpers::generateRegions(std::unordered_map<std::string, drake::VectorX<double>> &seeds_points, drake::multibody::MultibodyPlant<double> &plant, drake::systems::Context<double> *context)
+std::vector<drake::geometry::optimization::HPolyhedron> helpers::generateRegions(std::unordered_map<std::string, drake::VectorX<double>> &seeds_points, drake::multibody::MultibodyPlant<double> &plant, drake::systems::Context<double> *context, drake::geometry::optimization::IrisOptions &iris_options)
 {
     std::vector<drake::VectorX<double>> seeds;
     std::vector<drake::geometry::optimization::HPolyhedron> regions;
@@ -150,10 +152,17 @@ std::vector<drake::geometry::optimization::HPolyhedron> helpers::generateRegions
     std::vector<std::future<drake::geometry::optimization::HPolyhedron>> futures;
     for (int i = 0; i < seeds.size(); i++)
     {
-        Eigen::Ref<const drake::VectorX<double>> ref(seeds[i]);
-        futures.push_back(std::async(std::launch::async, calcRegion, i, ref, plant, context));
+        futures.push_back(std::async(std::launch::async, calcRegion, i, seeds[i], std::ref(plant), context, std::ref(iris_options)));
+        // futures.push_back(std::async(std::launch::async, calcRegion, i, seeds[i], std::ref(plant), context, std::ref(iris_options)));
     }
-
+    for (auto &fu : futures){
+        fu.wait();
+    }
+    for (auto &fu : futures)
+    {
+        regions.push_back(fu.get());
+    }
+    drake::log()->info("Elapsed Time: {0}", timer->Tick());
     return regions;
 }
 
