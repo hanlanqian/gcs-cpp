@@ -128,15 +128,15 @@ std::unordered_map<std::string, drake::math::RigidTransform<double>> helpers::ge
 
 drake::geometry::optimization::HPolyhedron helpers::calcRegion(int i, const drake::VectorX<double> &seed, drake::multibody::MultibodyPlant<double> &plant, drake::systems::Context<double> *context, drake::geometry::optimization::IrisOptions &iris_options)
 {
-    sem.acquire();
     auto timer = new drake::SteadyTimer();
     timer->Start();
     auto plan_context = &plant.GetMyMutableContextFromRoot(context);
     plant.SetPositions(plan_context, seed);
     drake::log()->info("Time: {1} minutes.", i, timer->Tick());
+    sem.acquire();
     auto hpoly = drake::geometry::optimization::IrisInConfigurationSpace(plant, *plan_context, iris_options);
-    drake::log()->info("Seed: {0}\tTime: {1} minutes.\tFaces: {2}", i, timer->Tick(), hpoly.b().size());
     sem.release();
+    drake::log()->info("Seed: {0}\tTime: {1} minutes.\tFaces: {2}", i, timer->Tick(), hpoly.b().size());
     return hpoly;
 }
 

@@ -32,10 +32,10 @@ int main(int argc, char const *argv[], char **envp)
     }
     // load Mosek solver Path
     auto mosek = drake::solvers::MosekSolver::AcquireLicense();
-    // if (!mosek)
-    // {
-    //     throw std::invalid_argument("Fail to load MosekSolver");
-    // }
+    if (!mosek)
+    {
+        throw std::invalid_argument("Fail to load MosekSolver");
+    }
 
     // simulation setup
     auto meshcat = new drake::geometry::Meshcat();
@@ -89,28 +89,17 @@ int main(int argc, char const *argv[], char **envp)
     // IRIS Region Generations
     auto iris_options = drake::geometry::optimization::IrisOptions();
     iris_options.require_sample_point_is_contained = true;
-    iris_options.iteration_limit = 5;
+    iris_options.iteration_limit = 1;
     iris_options.termination_threshold = -1;
     iris_options.relative_termination_threshold = 0.02;
     iris_options.num_collision_infeasible_samples = 1;
-
     helpers::filterCollsionGeometry(res.scene_graph, sg_context);
     auto seeds = helpers::getConfigurationSeeds();
     drake::log()->info("number of seeds: {0}", seeds.size());
-    // std::vector<drake::geometry::optimization::HPolyhedron> regions(seeds.size());
-    // std::vector<drake::VectorX<double>> seeds_list;
-    // for (auto &sp : seeds)
-    // {
-    //     seeds_list.push_back(sp.second);
-    // }
-    // for (size_t i = 0; i < seeds.size(); i++)
-    // {
-    //     auto cur = helpers::calcRegion(i, std::ref(seeds_list[i]), res.plant, context.get(), iris_options);
-    //     regions[i] = cur;
-    // }
-
     auto regions = helpers::generateRegions(seeds, res.plant, context.get(), iris_options);
 
+    // gcs stage
+    
     drake::log()->info("example ended.");
     while (1)
     {
