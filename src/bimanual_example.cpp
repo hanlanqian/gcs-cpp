@@ -50,7 +50,6 @@ int main(int argc, char const *argv[])
     for (drake::multibody::JointIndex joint_index : res.plant.GetJointIndices(iiwa_1.model_instance))
     {
         auto joint = &res.plant.get_mutable_joint(joint_index);
-        drake::log()->info(joint->type_name());
         if (joint->type_name() == "revolute")
         {
             joint->set_default_positions(Eigen::Matrix<double, 1, 1>{q0[index]});
@@ -61,7 +60,6 @@ int main(int argc, char const *argv[])
     for (drake::multibody::JointIndex joint_index : res.plant.GetJointIndices(iiwa_2.model_instance))
     {
         auto joint = &res.plant.get_mutable_joint(joint_index);
-        drake::log()->info(joint->type_name());
         if (joint->type_name() == "revolute")
         {
             joint->set_default_positions(Eigen::Matrix<double, 1, 1>{q0[index]});
@@ -84,8 +82,6 @@ int main(int argc, char const *argv[])
 
     helpers::filterCollsionGeometry(res.scene_graph, sg_context);
     auto seeds = helpers::getConfigurationSeeds();
-    
-
     drake::log()->info("example ended.");
     while (1)
     {

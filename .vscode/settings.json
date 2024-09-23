@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.txt": "cmake",
         "*.tcc": "cpp",
         "cctype": "cpp",
         "clocale": "cpp",
@@ -65,6 +66,8 @@
         "cinttypes": "cpp",
         "typeindex": "cpp",
         "typeinfo": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "fstream": "cpp",
+        "future": "cpp"
     }
 }
