@@ -114,8 +114,6 @@ void helpers::filterCollsionGeometry(drake::geometry::SceneGraph<double> &scene_
     filter_manager.Apply(drake::geometry::CollisionFilterDeclaration().ExcludeBetween(
         drake::geometry::GeometrySet(helpers::concatenateVectors({iiwa1[0], iiwa1[1]})), drake::geometry::GeometrySet(iiwa2[2])));
 
-    // drake::log()->info(scene_graph.get_query_output_port().get_name());
-    // drake::log()->info(scene_graph.get_query_output_port().Eval<drake::geometry::QueryObject>(context));
     auto pairs = scene_graph.get_query_output_port().Eval<drake::geometry::QueryObject<double>>(*context).inspector().GetCollisionCandidates();
     drake::log()->info("Filtered collision pairs from " + std::to_string(inspector->GetCollisionCandidates().size()) + " to " + std::to_string(pairs.size()));
 }
@@ -153,7 +151,6 @@ std::vector<drake::geometry::optimization::HPolyhedron> helpers::generateRegions
     for (int i = 0; i < seeds.size(); i++)
     {
         futures.push_back(std::async(std::launch::async, calcRegion, i, seeds[i], std::ref(plant), context, std::ref(iris_options)));
-        // futures.push_back(std::async(std::launch::async, calcRegion, i, seeds[i], std::ref(plant), context, std::ref(iris_options)));
     }
     for (auto &fu : futures){
         fu.wait();

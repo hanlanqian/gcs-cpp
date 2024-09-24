@@ -19,6 +19,16 @@ private:
 
 public:
     BaseGCS();
-    BaseGCS(std::vector<drake::geometry::optimization::HPolyhedron> &regions);
+    BaseGCS(const std::vector<drake::geometry::optimization::HPolyhedron> &regions);
     ~BaseGCS();
+};
+
+class LinearGCS : public BaseGCS
+{
+private:
+    static std::vector<std::pair<int, int>> empty;
+public:
+    LinearGCS(/* args */);
+    LinearGCS(const std::vector<drake::geometry::optimization::HPolyhedron> regions, const std::vector<std::pair<int, int>> &edges = empty);
+    ~LinearGCS();
 };
