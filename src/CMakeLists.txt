@@ -1,5 +1,6 @@
 # find_package(gflags REQUIRED)
 add_subdirectory(gcs)
+add_subdirectory(test)
 
 add_library(helpers SHARED "${PROJECT_SOURCE_DIR}/include/helpers.h" helpers.cpp)
 target_include_directories(helpers PUBLIC "${PROJECT_SOURCE_DIR}/include")

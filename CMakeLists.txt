@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
 project(bimanual)
+set(CMAKE_CXX_STANDARD 20)
 find_package(drake CONFIG REQUIRED)
 add_subdirectory(src)

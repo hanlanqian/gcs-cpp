@@ -44,8 +44,13 @@ int main(int argc, char const *argv[], char **envp)
     auto res = drake::multibody::AddMultibodyPlantSceneGraph(&db, 0.0);
     auto parser = drake::multibody::Parser(&res.plant);
     parser.package_map().Remove("drake_models");
-    parser.package_map().Add("gcs", "/home/elaina/projects/gcs-science-robotics");
+    parser.package_map().Remove("drake");
+    parser.package_map().Add("gcs", "/home/elaina/projects/gcs-cpp");
     parser.package_map().Add("drake_models", "/home/elaina/projects/manipulation/models");
+    parser.package_map().Add("drake", "/home/elaina/projects");
+    drake::log()->info(parser.package_map().GetPath("gcs"));
+    drake::log()->info(parser.package_map().GetPath("drake"));
+    drake::log()->info(parser.package_map().GetPath("drake_models"));
     const std::string directives_file = parser.package_map().GetPath("gcs") + "/models/bimanual_iiwa.yaml";
     auto directives = drake::multibody::parsing::LoadModelDirectives(directives_file);
     auto models = drake::multibody::parsing::ProcessModelDirectives(directives, &parser);
@@ -97,14 +102,14 @@ int main(int argc, char const *argv[], char **envp)
     auto seeds = helpers::getConfigurationSeeds();
     drake::log()->info("number of seeds: {0}", seeds.size());
     auto regions = helpers::generateRegions(seeds, res.plant, context.get(), iris_options);
-
+    drake::log()->info("IRIS ended.");
+    drake::log()->info("Generated {} regions", regions.size());
     // gcs stage
     
-    drake::log()->info("example ended.");
-    while (1)
-    {
-        sleep(1);
-        drake::log()->info("looping.");
-    }
+    // while (1)
+    // {
+    //     sleep(1);
+    //     drake::log()->info("looping.");
+    // }
     return 0;
 }

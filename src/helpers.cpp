@@ -151,13 +151,19 @@ std::vector<drake::geometry::optimization::HPolyhedron> helpers::generateRegions
     for (int i = 0; i < seeds.size(); i++)
     {
         futures.push_back(std::async(std::launch::async, calcRegion, i, seeds[i], std::ref(plant), context, std::ref(iris_options)));
-    }
-    for (auto &fu : futures){
-        fu.wait();
+        drake::log()->info("add thread for task/seed {}", i);
+        sleep(1);
     }
     for (auto &fu : futures)
     {
-        regions.push_back(fu.get());
+        try
+        {
+            regions.push_back(fu.get());
+        }
+        catch (const std::exception &e)
+        {
+            drake::log()->error("Error in async task: {}", e.what());
+        }
     }
     drake::log()->info("Elapsed Time: {0}", timer->Tick());
     return regions;
@@ -186,6 +192,10 @@ std::unordered_map<std::string, drake::VectorX<double>> helpers::getConfiguratio
         {"bin_R/shelf_2", drake::VectorX<double>::Map(std::vector<double>{0.81207937, -1.25360462, -1.58097816, -1.51554761, -1.32224557, 1.50550485, -2.38221483, -0.44166552, 0.62965782, 0.20604497, -1.7332434, -0.41353464, -0.6873727, 0.17439863}.data(), 14)},
         {"bin_R/bin_L", drake::VectorX<double>::Map(std::vector<double>{-1.73637519, 0.6209681, 0.24232887, -1.51538355, -0.17977474, 0.92618894, -3.01360257, 1.31861497, 0.72394333, 0.4044295, -1.37509496, -0.27461997, 1.20038493, 0.18611701}.data(), 14)},
         {"neutral/neutral", drake::VectorX<double>::Map(std::vector<double>{0.0, -0.2, 0, -1.2, 0, 1.6, 0.0, 0.0, -0.2, 0, -1.2, 0, 1.6, 0.0}.data(), 14)},
-        {"neutral/shelf_1", drake::VectorX<double>::Map(std::vector<double>{0.0, -0.2, 0, -1.2, 0, 1.6, 0.0, -0.93496866, 0.463425, 0.92801564, -1.45777634, -0.3106235, -0.06577172, -0.06019173}.data(), 14)}};
+        {"neutral/shelf_1", drake::VectorX<double>::Map(std::vector<double>{0.0, -0.2, 0, -1.2, 0, 1.6, 0.0, -0.93496866, 0.463425, 0.92801564, -1.45777634, -0.3106235, -0.06577172, -0.06019173}.data(), 14)},
+        {"neutral/shelf_2", drake::VectorX<double>::Map(std::vector<double>{0.0, -0.2, 0, -1.2, 0, 1.6, 0.0, -0.44166552, 0.62965782, 0.20604497, -1.7332434, -0.41353464, -0.6873727, 0.17439863}.data(), 14)},
+        {"shelf_1/neutral", drake::VectorX<double>::Map(std::vector<double>{0.93496924, 0.46342534, -0.92801666, -1.45777635, 0.31061724, -0.0657716, 0.06019899, 0.0, -0.2, 0, -1.2, 0, 1.6, 0.0}.data(), 14)},
+        {"shelf_2/neutral", drake::VectorX<double>::Map(std::vector<double>{0.44161528, 0.62965169, -0.20597726, -1.73324347, 0.41354399, -0.68738565, -0.17444283, 0.0, -0.2, 0, -1.2, 0, 1.6, 0.0}.data(), 14)},
+        {"shelf_2_cross/top_shelf_cross", drake::VectorX<double>::Map(std::vector<double>{0.47500706, 0.72909874, 0.01397772, -1.52841372, 0.15392366, -0.591641, -0.12870521, -0.48821156, 0.67762534, 0.02049926, -0.27420758, 0.10620709, 0.72215209, -0.09973172}.data(), 14)}};
     return seeds;
 }
