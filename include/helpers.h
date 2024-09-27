@@ -11,6 +11,7 @@
 
 namespace helpers
 {
+
     const int max_cores = 16;
     std::counting_semaphore<max_cores> sem(max_cores);
     void filterCollsionGeometry(drake::geometry::SceneGraph<double> &scene_graph, drake::systems::Context<double> *context);
@@ -21,4 +22,20 @@ namespace helpers
 
     template <typename T>
     std::vector<T> concatenateVectors(const std::initializer_list<std::vector<T>> &vectors);
+
+    class IrisRegions
+    {
+    public:
+        std::vector<drake::geometry::optimization::HPolyhedron> regions;
+        IrisRegions(std::vector<drake::geometry::optimization::HPolyhedron> &regs);
+        template <typename Archive>
+        void Serialize(Archive *a);
+    };
+
+    template <typename Archive>
+    inline void IrisRegions::Serialize(Archive *a)
+    {
+        a->Visit(DRAKE_NVP(this->regions));
+    }
+
 } // namespace helpers

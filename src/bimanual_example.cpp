@@ -106,10 +106,10 @@ int main(int argc, char const *argv[], char **envp)
     drake::log()->info("Generated {} regions", regions.size());
     // gcs stage
     
-    // while (1)
-    // {
-    //     sleep(1);
-    //     drake::log()->info("looping.");
-    // }
+    while (1)
+    {
+        sleep(1);
+        drake::log()->info("looping.");
+    }
     return 0;
 }

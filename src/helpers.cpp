@@ -199,3 +199,9 @@ std::unordered_map<std::string, drake::VectorX<double>> helpers::getConfiguratio
         {"shelf_2_cross/top_shelf_cross", drake::VectorX<double>::Map(std::vector<double>{0.47500706, 0.72909874, 0.01397772, -1.52841372, 0.15392366, -0.591641, -0.12870521, -0.48821156, 0.67762534, 0.02049926, -0.27420758, 0.10620709, 0.72215209, -0.09973172}.data(), 14)}};
     return seeds;
 }
+
+helpers::IrisRegions::IrisRegions(std::vector<drake::geometry::optimization::HPolyhedron> &regs)
+{
+    this->regions = regs;
+}
+

@@ -1,4 +1,5 @@
 #include "gcs.h"
+#include "gcs_helpers.h"
 
 int BaseGCS::dimension()
 {
@@ -131,13 +132,8 @@ void BaseGCS::solveGCS(bool rounding, bool preprocessing, bool verbose)
     if (rounding) {
         options.max_rounded_paths = 10;
         auto rounding_result = this->gcs.SolveShortestPath(*this->source, *this->target, this->options);
-        
+        gcs_helpers::mipPathExtraction(this->gcs, rounding_result, this->source, this->target);
     }
-}
-
-void BaseGCS::greedyForwardPathSearch(drake::geometry::optimization::GraphOfConvexSets &gcs, drake::solvers::MathematicalProgramResult &result, drake::geometry::optimization::GraphOfConvexSets::Vertex *source, drake::geometry::optimization::GraphOfConvexSets::Vertex *target, int max_paths, int max_trials, double flow_tol)
-{
-    
 }
 
 LinearGCS::LinearGCS(const std::vector<drake::geometry::optimization::HPolyhedron> regions, std::vector<std::pair<int, int>> edges, drake::VectorX<double> path_weights, bool full_dim_overlap) : BaseGCS(regions), edge_costs(Eigen::MatrixXd::Zero(this->dimension(), this->dimension() * 2), Eigen::VectorXd::Zero(this->dimension()))
